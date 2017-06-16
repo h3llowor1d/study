@@ -59,7 +59,7 @@ func (this *ApiController) Get() {
 		for j := dataLen; j > 0; j-- {
 			itemDatas = append(itemDatas, ItemData{
 				UnixTime: nowTime - j,
-				Value:    rand.Float64() * 500,
+				Value:    rand.Float64() * 1000,
 			})
 		}
 

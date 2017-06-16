@@ -43,7 +43,6 @@
 
       })
 
-      var charts = {}
       var chartCount = 0
       var makeGraph = function(graphData){
 
@@ -55,8 +54,56 @@
               },
               toolTip:{
                   shared: true,
-                  content: "{name}: {y}"
-              }
+                  content:"{name}: {y}",
+                  // 格式化 toolTip 的内容
+                  contentFormatter: function (e) {
+                      var localTime = CanvasJS.formatDate( e.value, "MM-DD HH:mm:ss")
+                      var content = localTime+ "<br>";
+                      for (var i = 0; i < e.entries.length; i++) {
+                          var formatString = ""
+                          if (e.entries[i].dataPoint.y > 1000 && e.entries[i].dataPoint.y < 1000*1000){
+                              formatString = "#,###,.##K"
+                          }else if (e.entries[i].dataPoint.y > 1000*1000 && e.entries[i].dataPoint.y < 1000*1000*1000){
+                              formatString = "#,###,.##G"
+                          }
+
+                          var value = CanvasJS.formatNumber(e.entries[i].dataPoint.y,formatString)
+                          content += e.entries[i].dataSeries.name + " " + "<strong>" + value + "</strong>";
+                          content += "<br/>";
+                      }
+                      return content;
+                  }
+              },
+              axisX:{
+                  labelFormatter: function (e) {
+                      return CanvasJS.formatDate( e.value, "MM-DD HH:mm:ss");
+                  },
+                  labelAngle: -20,
+                  //interval: 30,
+                  //intervalType: "second"
+                  //valueFormatString: "#,##0.##",
+                  gridColor: "Silver"
+                  //valueFormatString: "MM-DD HH:mm:ss"
+              },
+              axisY:{
+                  //valueFormatString: "#,##0.##",
+                  //valueFormatString: "#,##0.##",
+                  //suffix:"B"
+
+              },
+              legend: {
+                  cursor: "pointer",
+                  itemclick: function (e) {
+                      //console.log("legend click: " + e.dataPointIndex);
+                      //console.log(e);
+                      if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                          e.dataSeries.visible = false
+                      } else {
+                          e.dataSeries.visible = true
+                      }
+                      e.chart.render()
+                  }
+              },
           }
           chartConfig.title.text = graphData.name
           var dataProvider = []
@@ -70,9 +117,7 @@
 
               $.each(ctx.data,function(idx1,ctx1){
                   itemData.dataPoints.push({
-                      //label:"line"+(j+1),
-                      //name:"name"+(j+1),
-                      x:new Date(ctx1.unix_time),
+                      x:new Date(ctx1.unix_time * 1000),
                       y: ctx1.value
                   })
               })
@@ -86,82 +131,9 @@
           chart.render()
       }
 
-      /*
-      $(function(){
-          var $body = $('body')
-          for (var j=0;j<11;j++){
-
-              var $div = $('<div id="chart'+j+'" class="mychart"></div>')
-              $body.append($div)
-
-
-              var dataPoints = [];
-              var dataPoints1 = [];
-              var y = 0;
-
-              for ( var i = 0; i < 1000; i++ ) {
-
-                  y += Math.round(5 + Math.random() * (-5 - 5));
-                  dataPoints.push({
-                      label:"line"+(j+1),
-                      //name:"name"+(j+1),
-                      x:i,
-                      y: y
-                  });
-
-                  dataPoints1.push({
-                      label:"line"+(j+1),
-                      x:i,
-                      y: y+100
-                  });
-              }
-
-              var chart = new CanvasJS.Chart("chart"+j,
-                  {
-                      animationEnabled: true,
-                      zoomEnabled: true,
-
-                      title:{
-                          text: "Performance Demo with 10,00 DataPoints"
-                      },
-                      toolTip:{
-                          shared: true,
-                          content: "{name}: {y}"
-                      },
-                      // axisX:{
-                      //   gridColor: "Silver",
-                      //   valueFormatString: "DD/MMM"
-                      // },
-                      data: [
-                          { //name:"name"+j,
-                              showInLegend: true,
-                              type: "spline",
-                              dataPoints: dataPoints
-                          },
-                          {
-                              name:"linename2",
-                              showInLegend: true,
-                              type: "spline",
-                              dataPoints: dataPoints1
-                          }
-                      ]
-                  });
-              chart.render();
-
-          }
-
-
-      })
-
-       */
-
-
   </script>
 </head>
 <body>
-<!-- <div id="chart0" style="height: 300px;width: 100%;background: green";></div>
-<div id="chart1" style="height: 300px;width: 100%;background: green";></div>
-<div id="chart2" style="height: 300px;width: 100%;background: green";></div> -->
 </body>
 
 </html>
